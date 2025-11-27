@@ -1,5 +1,6 @@
 // src/services/product.service.js
 
+const { default: mongoose } = require("mongoose");
 const Product = require("../models/product.model");
 
 exports.createProduct = async (data) => {
@@ -9,7 +10,33 @@ exports.createProduct = async (data) => {
 };
 
 exports.getAllProducts = async () => {
-  return await Product.find().sort({ createdAt: -1 });
+  const products = await Product.aggregate([
+    {
+      $lookup: {
+        from: "tbl_wishlists",
+        let: { productId: "$_id" },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  { $eq: ["$productId", "$$productId"] },
+                  // { $eq: ["$userId", mongoose.Types.ObjectId(userId)] },
+                ],
+              },
+            },
+          },
+        ],
+        as: "wishlistInfo",
+      },
+    },
+    {
+      $addFields: {
+        isWishlist: { $gt: [{ $size: "$wishlistInfo" }, 0] },
+      },
+    },
+  ]);
+  return products;
 };
 
 exports.updateProduct = async (id, data) => {

@@ -1,4 +1,6 @@
 const productService = require("../services/productService");
+const Wishlist = require("../models/wishlist.model");
+const Product = require("../models/product.model");
 
 exports.addProduct = async (req, res) => {
   try {
@@ -19,6 +21,7 @@ exports.addProduct = async (req, res) => {
 exports.getProducts = async (req, res) => {
   try {
     const list = await productService.getAllProducts();
+
     res.json(list);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -61,3 +64,52 @@ exports.adjustStock = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+// exports.getProductsWithWishlist = async (req, res) => {
+//   try {
+//     const userId = req.params.userId;
+
+//     const products = await Product.aggregate([
+//       {
+//         $lookup: {
+//           from: "tbl_wishlists",
+//           let: { productId: "$_id" },
+//           pipeline: [
+//             {
+//               $match: {
+//                 $expr: {
+//                   $and: [
+//                     { $eq: ["$productId", "$$productId"] },
+//                     { $eq: ["$userId", mongoose.Types.ObjectId(userId)] },
+//                   ],
+//                 },
+//               },
+//             },
+//           ],
+//           as: "wishlistInfo",
+//         },
+//       },
+//       {
+//         $addFields: {
+//           isWishlist: { $gt: [{ $size: "$wishlistInfo" }, 0] },
+//         },
+//       },
+//       {
+//         $project: {
+//           wishlistInfo: 0,
+//         },
+//       },
+//     ]);
+
+//     res.status(200).json({
+//       message: "Products fetched successfully",
+//       data: products,
+//     });
+//   } catch (err) {
+//     console.log(err);
+//     res.status(500).json({
+//       message: "Error fetching products",
+//       error: err,
+//     });
+//   }
+// };

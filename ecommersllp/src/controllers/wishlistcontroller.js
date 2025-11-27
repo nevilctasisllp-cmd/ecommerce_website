@@ -5,7 +5,6 @@ const { default: mongoose } = require("mongoose");
 exports.getWishlist = async (req, res) => {
   try {
     const userId = req.params.userId;
-    console.log("userId: ", userId);
 
     const data = await Wishlist.aggregate([
       {
@@ -14,7 +13,6 @@ exports.getWishlist = async (req, res) => {
     ]);
 
     res.json(data);
-    console.log("data: ", JSON.stringify(data, null, 2));
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error getting wishlist" });
@@ -39,14 +37,38 @@ exports.addToWishlist = async (req, res) => {
 
 exports.removeFromWishlist = async (req, res) => {
   try {
-    const { productId } = req.body;
-    const data = await wishlistService.removeFromWishlist(
-      req.user.id,
-      productId
-    );
+    const { userId, productId } = req.body;
 
-    res.json({ message: "Removed", wishlist: data });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+    if (!userId || !productId) {
+      return res.status(400).json({
+        status: false,
+        message: "userId or productId missing",
+      });
+    }
+
+    const deletedItem = await Wishlist.deleteOne({
+      userId: userId,
+      productId: productId,
+    });
+
+    if (deletedItem.deletedCount === 0) {
+      return res.status(404).json({
+        status: false,
+        message: "Product not found in wishlist",
+      });
+    }
+
+    const updatedWishlist = await Wishlist.find({ userId });
+
+    return res.json({
+      status: true,
+      message: "Product removed from wishlist",
+      data: updatedWishlist,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: false,
+      error: error.message,
+    });
   }
 };

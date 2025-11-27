@@ -1,6 +1,6 @@
 const userService = require("../services/userService");
 const User = require("../models/usermodel");
-const e = require("express");
+const express = require("express");
 const usermodel = require("../models/usermodel");
 
 // REGISTER USER

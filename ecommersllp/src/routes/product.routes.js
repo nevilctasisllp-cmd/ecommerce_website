@@ -5,7 +5,7 @@ const productController = require("../controllers/productController");
 
 // PRODUCT ROUTES
 router.post("/add", productController.addProduct);
-router.get("/", productController.getAllProducts);
+router.get("/", productController.getProducts);
 router.put("/:id", productController.updateProduct);
 router.delete("/:id", productController.deleteProduct);
 router.post("/:id/stock", productController.adjustStock);

@@ -1,36 +1,52 @@
+const wishlistService = require("../services/wishlist.service");
 const Wishlist = require("../models/wishlist.model");
+const { default: mongoose } = require("mongoose");
 
-// ADD TO WISHLIST
-exports.addWishlist = async (req, res) => {
+exports.getWishlist = async (req, res) => {
   try {
-    const { userId, productId, name, price, image } = req.body;
+    const userId = req.params.userId;
+    console.log("userId: ", userId);
 
-    const exist = await Wishlist.findOne({ userId, productId });
-    if (exist) return res.json({ message: "Already in wishlist" });
+    const data = await Wishlist.aggregate([
+      {
+        $match: { userId: new mongoose.Types.ObjectId(userId) },
+      },
+    ]);
 
-    const item = await Wishlist.create({
-      userId,
-      productId,
-      name,
-      price,
-      image,
-    });
-
-    res.json({ message: "Added to wishlist", item });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.json(data);
+    console.log("data: ", JSON.stringify(data, null, 2));
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error getting wishlist" });
   }
 };
 
-// GET WISHLIST
-exports.getWishlist = async (req, res) => {
-  const { userId } = req.params;
-  const items = await Wishlist.find({ userId });
-  res.json(items);
+exports.addToWishlist = async (req, res) => {
+  try {
+    const { productId, name, price } = req.body;
+    const data = await wishlistService.addToWishlist(
+      req.params.id,
+      productId,
+      name,
+      price
+    );
+
+    res.json({ message: "Added", wishlist: data });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 };
 
-// REMOVE WISHLIST ITEM
-exports.removeWishlist = async (req, res) => {
-  await Wishlist.findByIdAndDelete(req.params.id);
-  res.json({ message: "Removed" });
+exports.removeFromWishlist = async (req, res) => {
+  try {
+    const { productId } = req.body;
+    const data = await wishlistService.removeFromWishlist(
+      req.user.id,
+      productId
+    );
+
+    res.json({ message: "Removed", wishlist: data });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 };

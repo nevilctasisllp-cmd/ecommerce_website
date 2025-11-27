@@ -10,6 +10,7 @@ const checkout = require("./src/routes/checkoutRoutes");
 const imageRoutes = require("./src/routes/image.routes");
 const upload = require("./src/middleware/upload");
 const path = require("path");
+const wishlist = require("../ecommersllp/src/routes/wishlist.routes");
 
 dotenv.config();
 
@@ -24,6 +25,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/checkout", checkout);
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/api", imageRoutes);
+app.use("/api/wishlist", wishlist);
 
 app.get("/", (req, res) => res.json({ ok: true }));
 
@@ -36,5 +38,5 @@ mongoose
   .catch((err) => console.error("❌ MongoDB Connection Error:", err));
 
 listener = app.listen(process.env.PORT || 3000, () => {
-  console.log(`Server running on port ${listener.address().port}`);
+  console.log("process.env.PORT: ", process.env.PORT);
 });

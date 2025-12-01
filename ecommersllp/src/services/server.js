@@ -48,7 +48,6 @@ app.post("/api/login", async (req, res) => {
 app.post("/api/logout", async (req, res) => {
   try {
     const { email } = req.body;
-    console.log("email: ", email);
     const user = await Users.findOneAndUpdate({ email }, { active: false });
 
     if (!email) {

@@ -11,6 +11,7 @@ const imageRoutes = require("./src/routes/image.routes");
 const upload = require("./src/middleware/upload");
 const path = require("path");
 const wishlist = require("../ecommersllp/src/routes/wishlist.routes");
+const orderRoutes = require("./src/routes/order.routes");
 
 dotenv.config();
 
@@ -26,6 +27,7 @@ app.use("/api/checkout", checkout);
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/api", imageRoutes);
 app.use("/api/wishlist", wishlist);
+app.use("/api/orders", orderRoutes);
 
 app.get("/", (req, res) => res.json({ ok: true }));
 

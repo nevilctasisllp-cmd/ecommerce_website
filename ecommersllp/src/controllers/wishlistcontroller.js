@@ -47,10 +47,10 @@ exports.removeFromWishlist = async (req, res) => {
     }
 
     const deletedItem = await Wishlist.deleteOne({
-      userId: userId,
-      productId: productId,
+      _id: productId._id,
     });
 
+    console.log("deletedItem: ", deletedItem);
     if (deletedItem.deletedCount === 0) {
       return res.status(404).json({
         status: false,

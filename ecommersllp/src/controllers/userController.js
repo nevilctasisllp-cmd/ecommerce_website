@@ -1,6 +1,6 @@
 const userService = require("../services/userService");
 const User = require("../models/usermodel");
-const e = require("express");
+const express = require("express");
 const usermodel = require("../models/usermodel");
 
 // REGISTER USER
@@ -24,8 +24,6 @@ exports.registerUser = async (req, res) => {
 // LOGIN
 exports.loginUser = async (req, res) => {
   try {
-    console.log("Login Body:", req.body);
-
     const { email, password } = req.body;
     if (!email || !password)
       return res.status(400).json({ message: "Email and password required" });

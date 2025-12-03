@@ -1,5 +1,4 @@
 const orderService = require("../services/order.service");
-const updateAddressService = require("../services/order.service");
 
 // Get User Orders
 exports.getUserOrders = async (req, res) => {
@@ -23,6 +22,7 @@ exports.getOrderCount = async (req, res) => {
   }
 };
 
+// UPDATE ADDRESS
 exports.updateAddress = async (req, res) => {
   try {
     const { orderId, newAddress } = req.body;
@@ -30,7 +30,10 @@ exports.updateAddress = async (req, res) => {
     if (!orderId || !newAddress)
       return res.status(400).json({ message: "Missing required fields" });
 
-    const updatedOrder = await updateAddressService(orderId, newAddress);
+    const updatedOrder = await orderService.updateAddressService(
+      orderId,
+      newAddress
+    );
 
     if (!updatedOrder)
       return res.status(404).json({ message: "Order not found" });
@@ -42,6 +45,30 @@ exports.updateAddress = async (req, res) => {
     });
   } catch (err) {
     console.error("UPDATE ADDRESS ERROR:", err);
+    return res.status(500).json({ error: err.message });
+  }
+};
+
+// DELETE ORDER
+exports.deleteOrder = async (req, res) => {
+  try {
+    const { orderId } = req.params;
+
+    if (!orderId)
+      return res.status(400).json({ message: "Order ID is required" });
+
+    const deletedOrder = await orderService.deleteOrderService(orderId);
+
+    if (!deletedOrder)
+      return res.status(404).json({ message: "Order not found" });
+
+    return res.json({
+      success: true,
+      message: "Order deleted successfully",
+      order: deletedOrder,
+    });
+  } catch (err) {
+    console.error("DELETE ORDER ERROR:", err);
     return res.status(500).json({ error: err.message });
   }
 };
